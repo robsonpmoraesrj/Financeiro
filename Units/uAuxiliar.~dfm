@@ -1,0 +1,53 @@
+object frmAuxiliar: TfrmAuxiliar
+  Left = 197
+  Top = 205
+  Width = 572
+  Height = 249
+  Caption = 'frmAuxiliar'
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'MS Sans Serif'
+  Font.Style = []
+  OldCreateOrder = False
+  PixelsPerInch = 96
+  TextHeight = 13
+  object Label1: TLabel
+    Left = 224
+    Top = 77
+    Width = 59
+    Height = 13
+    Caption = 'SOMA DE X'
+  end
+  object Label2: TLabel
+    Left = 312
+    Top = 77
+    Width = 59
+    Height = 13
+    Caption = 'SOMA DE Y'
+  end
+  object edtX: TEdit
+    Left = 224
+    Top = 96
+    Width = 73
+    Height = 21
+    TabOrder = 0
+  end
+  object edtY: TEdit
+    Left = 312
+    Top = 96
+    Width = 73
+    Height = 21
+    TabOrder = 1
+  end
+  object btnExecutar: TBitBtn
+    Left = 264
+    Top = 152
+    Width = 75
+    Height = 25
+    Caption = 'EXECUTAR'
+    TabOrder = 2
+    OnClick = btnExecutarClick
+  end
+end

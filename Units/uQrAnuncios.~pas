@@ -1,0 +1,88 @@
+unit uQrAnuncios;
+
+interface
+
+uses Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, QRCtrls, jpeg, QuickRpt, ExtCtrls, uDM, StdCtrls, QRPrntr;
+
+type
+  TqrRelAnuncios = class(TQuickRep)
+    QRBand1: TQRBand;
+    QRImage1: TQRImage;
+    QRLabel1: TQRLabel;
+    QRLabel2: TQRLabel;
+    QRLabel3: TQRLabel;
+    QRLabel4: TQRLabel;
+    QRShape1: TQRShape;
+    QRSysData2: TQRSysData;
+    QRLabel6: TQRLabel;
+    QRLabel7: TQRLabel;
+    QRLabel8: TQRLabel;
+    QRLabel9: TQRLabel;
+    QRLabel10: TQRLabel;
+    QRLabel11: TQRLabel;
+    QRLabel12: TQRLabel;
+    QRLabel13: TQRLabel;
+    QRLabel14: TQRLabel;
+    QRLabel16: TQRLabel;
+    QRLabel17: TQRLabel;
+    QRLabel18: TQRLabel;
+    QRLabel5: TQRLabel;
+    QRLabel19: TQRLabel;
+    QRLabel20: TQRLabel;
+    lblFiltro: TQRLabel;
+    QRBand2: TQRBand;
+    QRDBText1: TQRDBText;
+    QRDBText2: TQRDBText;
+    QRDBText3: TQRDBText;
+    QRDBText4: TQRDBText;
+    QRDBText5: TQRDBText;
+    QRDBText6: TQRDBText;
+    QRDBText7: TQRDBText;
+    QRDBText8: TQRDBText;
+    QRDBText9: TQRDBText;
+    QRDBText10: TQRDBText;
+    QRDBText11: TQRDBText;
+    QRDBText12: TQRDBText;
+    QRDBText13: TQRDBText;
+    QRDBText14: TQRDBText;
+    QRDBText15: TQRDBText;
+    lblPctInvestido: TQRLabel;
+    QRDBText17: TQRDBText;
+    QRBand4: TQRBand;
+    lTotalAtualizado: TQRLabel;
+    lTotalAtualjan: TQRLabel;
+    QRShape3: TQRShape;
+    lTotalAtualfev: TQRLabel;
+    lTotalAtualmar: TQRLabel;
+    lTotalAtualabr: TQRLabel;
+    lTotalAtualmai: TQRLabel;
+    lTotalAtualjun: TQRLabel;
+    lTotalAtualjul: TQRLabel;
+    lTotalAtualago: TQRLabel;
+    lTotalAtualset: TQRLabel;
+    lTotalAtualout: TQRLabel;
+    lTotalAtualnov: TQRLabel;
+    lTotalAtualdez: TQRLabel;
+    QRLabel21: TQRLabel;
+    lTotalPctInvestido: TQRLabel;
+    lTotalCotas: TQRLabel;
+    lTotalAtualGeral: TQRLabel;
+    QRBand3: TQRBand;
+    QRLabel22: TQRLabel;
+    QRSysData1: TQRSysData;
+    QRShape2: TQRShape;
+  private
+
+  public
+
+  end;
+
+var
+  qrRelAnuncios: TqrRelAnuncios;
+
+implementation
+
+{$R *.DFM}
+
+end.

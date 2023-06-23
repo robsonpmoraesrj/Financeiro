@@ -1,0 +1,194 @@
+unit uFiltroRelFechamento;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, StdCtrls, Mask, Buttons, DBCtrls, ExtCtrls, uDM, ADODB, uQRFechamento;
+
+type
+  TfrmFiltroRelFechamento = class(TForm)
+    Panel1: TPanel;
+    Label1: TLabel;
+    Label2: TLabel;
+    Label8: TLabel;
+    Label6: TLabel;
+    dblkTipoInvest: TDBLookupComboBox;
+    dblkInvestidor: TDBLookupComboBox;
+    btnGerar: TBitBtn;
+    dbtLimpar: TBitBtn;
+    btnSair: TBitBtn;
+    gbDataAtualizacao: TGroupBox;
+    Label4: TLabel;
+    Label5: TLabel;
+    mskeAberturaI: TMaskEdit;
+    mskeAberturaF: TMaskEdit;
+    dblkStatus: TDBLookupComboBox;
+    dblkCarteira: TDBLookupComboBox;
+    Label3: TLabel;
+    dblkAtivo: TDBLookupComboBox;
+    procedure btnSairClick(Sender: TObject);
+    procedure dbtLimparClick(Sender: TObject);
+    procedure btnGerarClick(Sender: TObject);
+    procedure FormActivate(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmFiltroRelFechamento: TfrmFiltroRelFechamento;
+  dDataAberturaI, dDataAberturaF, dDataVenctoI, dDataVenctoF : string;
+
+implementation
+
+{$R *.dfm}
+
+procedure TfrmFiltroRelFechamento.btnSairClick(Sender: TObject);
+begin
+  Close;
+  frmFiltroRelFechamento := nil;
+end;
+
+procedure TfrmFiltroRelFechamento.dbtLimparClick(Sender: TObject);
+begin
+  dblkTipoInvest.KeyValue := -1;
+  dblkInvestidor.KeyValue := -1;
+  dblkAtivo.KeyValue := -1;
+  mskeAberturaI.Text := '';
+  mskeAberturaF.Text := '';
+  dblkCarteira.KeyValue := -1;
+  dblkStatus.KeyValue := -1;
+end;
+
+procedure TfrmFiltroRelFechamento.btnGerarClick(Sender: TObject);
+  var relFechamento : TqrRelFechamento;
+  rError : boolean;
+begin
+  rError := false;
+  DMPrincipal.ADOQPerformace.Close;
+  DMPrincipal.ADOQPerformace.SQL.Clear;
+  DMPrincipal.ADOQPerformace.SQL.Add('/* Query estatística para listar a performace dos ativos ao longo do ano... */ ');
+  DMPrincipal.ADOQPerformace.SQL.Add('select ');
+  DMPrincipal.ADOQPerformace.SQL.Add('tf.dsc_investimento, ');
+  DMPrincipal.ADOQPerformace.SQL.Add('FORMAT(tf.vlr_alocado, ''C'', ''pt-br'') as vlr_alocado,');
+  DMPrincipal.ADOQPerformace.SQL.Add('FORMAT(sum(case when (month(tf.competencia) = 1) then tf.vlr_atualizado else 0 end), ''C'', ''pt-br'') as janeiro,');
+  DMPrincipal.ADOQPerformace.SQL.Add('FORMAT(sum(case when (month(tf.competencia) = 2) then tf.vlr_atualizado else 0 end), ''C'', ''pt-br'') as fevereiro,');
+  DMPrincipal.ADOQPerformace.SQL.Add('FORMAT(sum(case when (month(tf.competencia) = 3) then tf.vlr_atualizado else 0 end), ''C'', ''pt-br'') as marco,');
+  DMPrincipal.ADOQPerformace.SQL.Add('FORMAT(sum(case when (month(tf.competencia) = 4) then tf.vlr_atualizado else 0 end), ''C'', ''pt-br'') as abril,');
+  DMPrincipal.ADOQPerformace.SQL.Add('FORMAT(sum(case when (month(tf.competencia) = 5) then tf.vlr_atualizado else 0 end), ''C'', ''pt-br'') as maio,');
+  DMPrincipal.ADOQPerformace.SQL.Add('FORMAT(sum(case when (month(tf.competencia) = 6) then tf.vlr_atualizado else 0 end), ''C'', ''pt-br'') as junho,');
+  DMPrincipal.ADOQPerformace.SQL.Add('FORMAT(sum(case when (month(tf.competencia) = 7) then tf.vlr_atualizado else 0 end), ''C'', ''pt-br'') as julho,');
+  DMPrincipal.ADOQPerformace.SQL.Add('FORMAT(sum(case when (month(tf.competencia) = 8) then tf.vlr_atualizado else 0 end), ''C'', ''pt-br'') as agosto,');
+  DMPrincipal.ADOQPerformace.SQL.Add('FORMAT(sum(case when (month(tf.competencia) = 9) then tf.vlr_atualizado else 0 end), ''C'', ''pt-br'') as setembro,');
+  DMPrincipal.ADOQPerformace.SQL.Add('FORMAT(sum(case when (month(tf.competencia) = 10) then tf.vlr_atualizado else 0 end), ''C'', ''pt-br'') as outubro,');
+  DMPrincipal.ADOQPerformace.SQL.Add('FORMAT(sum(case when (month(tf.competencia) = 11) then tf.vlr_atualizado else 0 end), ''C'', ''pt-br'') as novembro,');
+  DMPrincipal.ADOQPerformace.SQL.Add('FORMAT(sum(case when (month(tf.competencia) = 12) then tf.vlr_atualizado else 0 end), ''C'', ''pt-br'') as dezembro');
+
+  DMPrincipal.ADOQPerformace.SQL.Add('from t_fechamento tf ');
+  DMPrincipal.ADOQPerformace.SQL.Add(', t_investimento ti ');
+  DMPrincipal.ADOQPerformace.SQL.Add(', t_ativo ta ');
+  DMPrincipal.ADOQPerformace.SQL.Add('where tf.cod_investimento = ti.cod_investimento ');
+  DMPrincipal.ADOQPerformace.SQL.Add('  and tf.cod_ativo = ta.cod_ativo ');
+
+  // Filtro por ATIVO...
+  if dblkAtivo.Text <> '' then
+  begin
+    DMPrincipal.ADOQPerformace.SQL.Add('and tf.cod_ativo = ' + quotedstr(dblkAtivo.KeyValue));
+  end;
+
+  // Filtro por TIPO DE INVESTIMENTO...
+  if dblkTipoInvest.Text <> '' then
+  begin
+    DMPrincipal.ADOQPerformace.SQL.Add('and ta.cod_tipoinvestimento = ' + quotedstr(dblkTipoInvest.KeyValue));
+  end;
+
+  // Filtro por CARTEIRA...
+  if dblkCarteira.Text <> '' then
+  begin
+    DMPrincipal.ADOQPerformace.SQL.Add('and tf.cod_carteira = ' + quotedstr(dblkCarteira.KeyValue));
+  end;
+
+  // Filtro por STATUS...
+  if dblkStatus.Text <> '' then
+  begin
+    DMPrincipal.ADOQPerformace.SQL.Add('and ti.cod_status = ' + quotedstr(dblkStatus.KeyValue));
+  end;
+
+  // Filtro por INVESTIDOR...
+  if dblkInvestidor.Text <> '' then
+  begin
+    DMPrincipal.ADOQPerformace.SQL.Add('and ti.cod_proprietario = ' + quotedstr(dblkInvestidor.KeyValue));
+  end;
+
+  // Filtro por DATA DE ABERTURA...
+  if mskeAberturaI.Text <> '  /    ' then
+  begin
+    if mskeAberturaF.Text <> '  /    ' then
+    begin
+      // Valida DATAS...
+      if mskeAberturaI.Text > mskeAberturaF.Text then
+      begin
+        messageDlg('Data de Abertura Inválida!', mtError, [mbOk],0);
+        rError := true;
+        mskeAberturaI.SetFocus;
+      end
+      else
+      begin
+        dDataAberturaI := copy(mskeAberturaI.Text,4,7) + '-' + copy(mskeAberturaI.Text,1,2);
+        dDataAberturaF := copy(mskeAberturaF.Text,4,7) + '-' + copy(mskeAberturaF.Text,1,2);
+        DMPrincipal.ADOQPerformace.SQL.Add('and substr(tf.competencia,1,7) between ' + quotedstr(dDataAberturaI) +  ' and ' + quotedstr(dDataAberturaF));
+      end;
+    end
+    else
+    begin
+      dDataAberturaI := copy(mskeAberturaI.Text,4,7) + '-' + copy(mskeAberturaI.Text,1,2);
+      DMPrincipal.ADOQPerformace.SQL.Add('and substr(tf.competencia,1,7) >= ' + quotedstr(dDataAberturaI));
+    end;
+  end
+  else
+  begin
+    if mskeAberturaF.Text <> '  /    ' then
+    begin
+      dDataAberturaF := copy(mskeAberturaF.Text,4,7) + '-' + copy(mskeAberturaF.Text,1,2);
+      DMPrincipal.ADOQPerformace.SQL.Add('and substr(tf.competencia,1,7) <= ' + quotedstr(dDataAberturaF));
+    end;
+  end;
+
+  // Agrupamento... 
+  DMPrincipal.ADOQPerformace.SQL.Add('group by tf.vlr_alocado, tf.dsc_investimento');
+  DMPrincipal.ADOQPerformace.SQL.Add('order by tf.dsc_investimento');
+
+  if rError = false then
+  begin
+    DMPrincipal.ADOQPerformace.Open;
+
+    relFechamento := TqrRelFechamento.Create(Self);
+    relFechamento.Preview;
+    relFechamento.Free;
+  end;
+end;
+
+procedure TfrmFiltroRelFechamento.FormActivate(Sender: TObject);
+begin
+  DMPrincipal.ADODSTipInvest.Open;
+  DMPrincipal.ADODSGestor.Open;
+  DMPrincipal.ADODSAtivo.Open;
+  DMPrincipal.ADODSStatus.Open;
+  DMPrincipal.ADODSCarteira.Open;
+
+  mskeAberturaI.Enabled := true;
+  mskeAberturaF.Enabled := true;
+end;
+
+procedure TfrmFiltroRelFechamento.FormCreate(Sender: TObject);
+begin
+  Left := (GetSystemMetrics(SM_CXSCREEN) - Width) div 2;
+  Top := (GetSystemMetrics(SM_CYSCREEN) - Height) div 2;
+
+  shortdateformat := 'dd/mm/yyyy';
+end;
+
+end.

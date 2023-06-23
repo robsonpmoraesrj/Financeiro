@@ -1,0 +1,46 @@
+unit uAuxiliar;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, StdCtrls, Buttons, DBCtrls;
+
+type
+  TfrmAuxiliar = class(TForm)
+    edtX: TEdit;
+    edtY: TEdit;
+    Label1: TLabel;
+    Label2: TLabel;
+    btnExecutar: TBitBtn;
+    procedure btnExecutarClick(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmAuxiliar: TfrmAuxiliar;
+
+implementation                                   
+{$R *.dfm}
+
+procedure TfrmAuxiliar.btnExecutarClick(Sender: TObject);
+var x,y,inicio,fim:integer;
+begin
+  x:=5;
+  y:=x+1;
+  inicio:=x+1;
+  fim:=100+x;
+
+  for y := inicio to fim do
+  begin
+    x:=x+y;
+  end;
+
+  edtX.Text:=inttostr(x);
+  edtY.Text:=inttostr(y);
+end;
+
+end.

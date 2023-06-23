@@ -1,0 +1,257 @@
+unit uCadAtivos;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, Grids, DBGrids, ExtCtrls, DBCtrls, StdCtrls, Buttons, Mask, uDM;
+
+type
+  TfrmCadAtivos = class(TForm)
+    GroupBox1: TGroupBox;
+    Label1: TLabel;
+    btnSair: TBitBtn;
+    edtProcurar: TEdit;
+    dbnCarteira: TDBNavigator;
+    dbgAtivos: TDBGrid;
+    Label2: TLabel;
+    Label3: TLabel;
+    edtInvestidor: TLabel;
+    edtStatus: TLabel;
+    dbeAbertura: TDBEdit;
+    dblcbTipo: TDBLookupComboBox;
+    dblcbGestor: TDBLookupComboBox;
+    btnNovo: TBitBtn;
+    btnSalvar: TBitBtn;
+    btnAlterar: TBitBtn;
+    btnCancelar: TBitBtn;
+    btnExcluir: TBitBtn;
+    dbeCaracteristica: TDBEdit;
+    Label4: TLabel;
+    Label5: TLabel;
+    dbeVencimento: TDBEdit;
+    Label6: TLabel;
+    dblcbCaracteristica: TDBLookupComboBox;
+    dbeNome: TDBEdit;
+    procedure FormActivate(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure FormCreate(Sender: TObject);
+    procedure edtProcurarKeyUp(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure btnNovoClick(Sender: TObject);
+    procedure btnSalvarClick(Sender: TObject);
+    procedure btnAlterarClick(Sender: TObject);
+    procedure btnCancelarClick(Sender: TObject);
+    procedure btnExcluirClick(Sender: TObject);
+    procedure btnSairClick(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmCadAtivos: TfrmCadAtivos;
+
+implementation
+
+{$R *.dfm}
+
+procedure TfrmCadAtivos.FormActivate(Sender: TObject);
+begin
+  DMPrincipal.ADODSAtivo.Open;
+  DMPrincipal.ADODSTipInvest.Open;
+  DMPrincipal.ADODSGestor.Open;
+  DMPrincipal.ADODSCaracteristica.Open;
+
+  dbeNome.Enabled := false;
+  dbeCaracteristica.Enabled := false;
+  dbeAbertura.Enabled := false;
+  dbeVencimento.Enabled := false;
+  dblcbCaracteristica.Enabled := false;
+  dblcbTipo.Enabled := false;
+  dblcbGestor.Enabled := false;
+  dblcbCaracteristica.ReadOnly := true;
+  dblcbTipo.readOnly := true;
+  dblcbGestor.readOnly := true;
+end;
+
+procedure TfrmCadAtivos.FormClose(Sender: TObject;
+  var Action: TCloseAction);
+begin
+  DMPrincipal.ADODSTipInvest.Close;
+  DMPrincipal.ADODSGestor.Close;
+  DMPrincipal.ADODSCaracteristica.Close;
+
+  DMPrincipal.ADODSAtivo.Close;
+  DMPrincipal.ADODSAtivo.CommandText := 'select * from t_ativo';
+  Action := caFree;
+
+  frmCadAtivos := nil;
+end;
+
+procedure TfrmCadAtivos.FormCreate(Sender: TObject);
+begin
+  Left := (GetSystemMetrics(SM_CXSCREEN) - Width) div 2;
+  Top := (GetSystemMetrics(SM_CYSCREEN) - Height) div 2;
+  edtProcurar.Enabled := true;
+end;
+
+procedure TfrmCadAtivos.edtProcurarKeyUp(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  DMPrincipal.ADODSAtivo.Close;
+  DMPrincipal.ADODSAtivo.CommandText := 'select * from t_ativo where nom_ativo like ' + #39 + edtProcurar.Text + '%' + #39;
+  DMPrincipal.ADODSAtivo.Open;
+end;
+
+procedure TfrmCadAtivos.btnNovoClick(Sender: TObject);
+begin
+  DMPrincipal.ADODSAtivo.Open;
+  DMPrincipal.ADODSAtivo.Append;
+  btnSalvar.Enabled := true;
+  btnCancelar.Enabled := true;
+  btnAlterar.Enabled := false;
+  btnNovo.Enabled := false;
+  btnExcluir.Enabled := false;
+
+  edtProcurar.Enabled := false;
+
+  dbeNome.ReadOnly := false;
+  dbeNome.Enabled:= true;
+  dbeCaracteristica.ReadOnly := false;
+  dbeCaracteristica.Enabled:= true;
+
+  dbeAbertura.ReadOnly := false;
+  dbeAbertura.Enabled := true;
+  dbeVencimento.ReadOnly := false;
+  dbeVencimento.Enabled := true;
+
+  dbeAbertura.Text := DateToStr(Date());
+  dbeVencimento.Text := DateToStr(Date());
+
+  //DMPrincipal.ADODSAtivo.FieldByName('dat_abertura').AsDateTime:=Date();
+  //DMPrincipal.ADODSAtivo.FieldByName('dat_vencimento').AsDateTime:=Date();
+
+  dblcbCaracteristica.ReadOnly := false;
+  dblcbTipo.readOnly := false;
+  dblcbCaracteristica.Enabled := true;
+  dblcbTipo.Enabled := true;
+  dblcbGestor.readOnly := false;
+  dblcbGestor.Enabled := true;
+  dbeNome.SetFocus;
+end;
+
+procedure TfrmCadAtivos.btnSalvarClick(Sender: TObject);
+begin
+  DMPrincipal.ADODSAtivo.Post;
+  btnSalvar.Enabled := false;
+  btnCancelar.Enabled := false;
+  btnAlterar.Enabled := true;
+  btnNovo.Enabled := true;
+  btnExcluir.Enabled := true;
+
+  edtProcurar.Enabled := true;
+
+  dbeNome.ReadOnly := true;
+  dbeNome.Enabled:= false;
+  dbeCaracteristica.ReadOnly := true;
+  dbeCaracteristica.Enabled:= false;
+
+  dbeAbertura.ReadOnly := true;
+  dbeAbertura.Enabled := false;
+  dbeVencimento.ReadOnly := true;
+  dbeVencimento.Enabled := false;
+
+  dblcbCaracteristica.ReadOnly := true;
+  dblcbTipo.readOnly := true;
+  dblcbCaracteristica.Enabled := false;
+  dblcbTipo.Enabled := false;
+  dblcbGestor.readOnly := true;
+  dblcbGestor.Enabled := false;
+
+  DMPrincipal.ADODSAtivo.Close;
+  DMPrincipal.ADODSAtivo.CommandText := 'select * from t_ativo';
+  DMPrincipal.ADODSAtivo.Open;
+end;
+
+procedure TfrmCadAtivos.btnAlterarClick(Sender: TObject);
+begin
+  DMPrincipal.ADODSAtivo.Open;
+  DMPrincipal.ADODSAtivo.Edit;
+  btnSalvar.Enabled := true;
+  btnCancelar.Enabled := true;
+  btnAlterar.Enabled := false;
+  btnNovo.Enabled := false;
+  btnExcluir.Enabled := false;
+
+  edtProcurar.Enabled := false;
+
+  dbeNome.ReadOnly := false;
+  dbeNome.Enabled:= true;
+  dbeCaracteristica.ReadOnly := false;
+  dbeCaracteristica.Enabled:= true;
+
+  dbeAbertura.ReadOnly := false;
+  dbeAbertura.Enabled := true;
+  dbeVencimento.ReadOnly := false;
+  dbeVencimento.Enabled := true;
+
+  dblcbCaracteristica.ReadOnly := false;
+  dblcbTipo.readOnly := false;
+  dblcbCaracteristica.Enabled := true;
+  dblcbTipo.Enabled := true;
+  dblcbGestor.readOnly := false;
+  dblcbGestor.Enabled := true;
+  dbeNome.SetFocus;
+end;
+
+procedure TfrmCadAtivos.btnCancelarClick(Sender: TObject);
+begin
+  DMPrincipal.ADODSAtivo.Cancel;
+  btnSalvar.Enabled := false;
+  btnCancelar.Enabled := false;
+  btnAlterar.Enabled := true;
+  btnNovo.Enabled := true;
+  btnExcluir.Enabled := true;
+
+  edtProcurar.Enabled := true;
+
+  dbeNome.ReadOnly := true;
+  dbeNome.Enabled:= false;
+  dbeCaracteristica.ReadOnly := true;
+  dbeCaracteristica.Enabled:= false;
+
+  dbeAbertura.ReadOnly := true;
+  dbeAbertura.Enabled := false;
+  dbeVencimento.ReadOnly := true;
+  dbeVencimento.Enabled := false;
+
+  dblcbCaracteristica.ReadOnly := true;
+  dblcbTipo.readOnly := true;
+  dblcbCaracteristica.Enabled := false;
+  dblcbTipo.Enabled := false;
+  dblcbGestor.readOnly := true;
+  dblcbGestor.Enabled := false;
+
+  DMPrincipal.ADODSAtivo.Close;
+  DMPrincipal.ADODSAtivo.CommandText := 'select * from t_ativo';
+  DMPrincipal.ADODSAtivo.Open;
+end;
+
+procedure TfrmCadAtivos.btnExcluirClick(Sender: TObject);
+begin
+  if messageDlg('Esta operação não poderá ser desfeita. Prosseguir',mtConfirmation, [mbYes, mbNo],0) = mrYes then
+  begin
+    messageDlg('Excluido ' + DMPrincipal.ADODSAtivo.Fields[1].asString, mtInformation, [mbOk], 0);
+    DMPrincipal.ADODSAtivo.Delete;
+  end;  
+end;
+
+procedure TfrmCadAtivos.btnSairClick(Sender: TObject);
+begin
+  Close;
+  frmCadAtivos := nil;
+end;
+
+end.

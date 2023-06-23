@@ -1,0 +1,115 @@
+unit uQRCambio;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, ExtCtrls, QuickRpt, QRCtrls, jpeg, uDM;
+
+
+
+
+type
+  TqrRelCambio = class(TForm)
+    QRBand1: TQRBand;
+    QRImage1: TQRImage;
+    QRLabel1: TQRLabel;
+    QRLabel2: TQRLabel;
+    QRLabel3: TQRLabel;
+    QRLabel4: TQRLabel;
+    QRShape1: TQRShape;
+    QRSysData2: TQRSysData;
+    QRLabel6: TQRLabel;
+    QRLabel7: TQRLabel;
+    QRLabel8: TQRLabel;
+    QRLabel9: TQRLabel;
+    QRLabel10: TQRLabel;
+    QRLabel11: TQRLabel;
+    QRLabel12: TQRLabel;
+    QRBand2: TQRBand;
+    QRDBText1: TQRDBText;
+    QRDBText2: TQRDBText;
+    QRDBText3: TQRDBText;
+    QRDBText4: TQRDBText;
+    QRDBText5: TQRDBText;
+    QRDBText6: TQRDBText;
+    QRDBText7: TQRDBText;
+    QRDBText8: TQRDBText;
+    QRDBText9: TQRDBText;
+    QRBand4: TQRBand;
+    QRLabel15: TQRLabel;
+    lTotalAporte_us: TQRLabel;
+    QRShape3: TQRShape;
+    QRBand3: TQRBand;
+    QRLabel5: TQRLabel;
+    QRSysData1: TQRSysData;
+    QRShape2: TQRShape;
+    QRLabel13: TQRLabel;
+    QRDBText10: TQRDBText;
+    qrRelCambio: TQuickRep;
+    lTotalAporte_br: TQRLabel;
+    lTotalTaxas: TQRLabel;
+    lTotalVlrFinalBR: TQRLabel;
+    procedure QRBand2AfterPrint(Sender: TQRCustomBand;
+      BandPrinted: Boolean);
+    procedure QRBand4BeforePrint(Sender: TQRCustomBand;
+      var PrintBand: Boolean);
+    procedure qrRelCambioBeforePrint(Sender: TCustomQuickRep;
+      var PrintReport: Boolean);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  qrRelCambio: TqrRelCambio;
+  var totalAporte_br, totalAporte_us, totalTaxas, totalValorFinal_br : Double;
+
+implementation
+
+{$R *.dfm}
+
+procedure TqrRelCambio.QRBand2AfterPrint(Sender: TQRCustomBand;
+  BandPrinted: Boolean);
+begin
+
+  if not DMPrincipal.ADOQCambio.Eof then
+  begin
+    totalAporte_br := totalAporte_br + DMPrincipal.ADOQCambio.fieldbyname('vlr_aporte_br').Value;
+    totalTaxas := totalTaxas + DMPrincipal.ADOQCambio.fieldbyname('vlr_taxas').Value;
+    totalValorFinal_br := totalValorFinal_br + DMPrincipal.ADOQCambio.fieldbyname('vlr_final_br').Value;
+    totalAporte_us := totalAporte_us + DMPrincipal.ADOQCambio.fieldbyname('vlr_aporte_us').Value;
+
+    //StringReplace(FloatToStr(DMPrincipal.ADOQCambio.fieldbyname('vlr_aporte_us').Value), '.', ',', [rfReplaceAll]);
+  end
+  else
+  begin
+    totalAporte_br := totalAporte_br + 0;
+    totalTaxas := totalTaxas + 0;
+    totalValorFinal_br := totalValorFinal_br + 0;
+    totalAporte_us := totalAporte_us + 0;
+  end;
+
+end;
+
+procedure TqrRelCambio.QRBand4BeforePrint(Sender: TQRCustomBand;
+  var PrintBand: Boolean);
+begin
+  lTotalAporte_br.Caption := formatfloat('R$###,###,##0.00',totalAporte_br);
+  lTotalTaxas.Caption := formatfloat('R$###,###,##0.00',totalTaxas);
+  lTotalVlrFinalBR.Caption := formatfloat('R$###,###,##0.00',totalValorFinal_br);
+  lTotalAporte_us.Caption := formatfloat('U$###,###,##0.00',totalAporte_us);
+end;
+
+procedure TqrRelCambio.qrRelCambioBeforePrint(Sender: TCustomQuickRep;
+  var PrintReport: Boolean);
+begin
+  totalAporte_br := 0;
+  totalTaxas := 0;
+  totalValorFinal_br := 0;
+  totalAporte_us := 0;
+  //DMPrincipal.ADOQAlocacoes.Open;
+end;
+
+end.
